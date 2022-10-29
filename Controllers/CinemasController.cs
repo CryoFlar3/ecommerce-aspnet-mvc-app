@@ -39,7 +39,7 @@ namespace eTickets.Controllers
             return View(cinemaDetails);
         }
 
-        //Get: Actors/Edit/1
+        //Get: Cinema/Edit/1
         public async Task<IActionResult> Edit(int id) {
             var cinemaDetails = await _service.GetByIdAsync(id);
             if (cinemaDetails == null) return View("NotFound");
@@ -54,7 +54,7 @@ namespace eTickets.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //Get: Actors/Delete/1
+        //Get: Cinema/Delete/1
         public async Task<IActionResult> Delete(int id) {
             var cinemaDetails = await _service.GetByIdAsync(id);
             if (cinemaDetails == null) return View("NotFound");
