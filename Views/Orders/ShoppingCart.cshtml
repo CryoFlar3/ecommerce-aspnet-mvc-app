@@ -21,20 +21,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(var item in Model.ShoppingCart.ShoppingCartItems){
+                @foreach (var item in Model.ShoppingCart.ShoppingCartItems) {
                     <tr>
                         <td class="align-middle">@item.Amount</td>
                         <td class="align-middle">@item.Movie.Name</td>
                         <td class="align-middle">@item.Movie.Price.ToString("c")</td>
-                        <td class="align-middle">@((item.Amount*item.Movie.Price).ToString("c"))</td>
+                        <td class="align-middle">@((item.Amount * item.Movie.Price).ToString("c"))</td>
                         <td class="align-middle">
                             <a class="text-center" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart" asp-route-id="@item.Movie.Id">
-                                <i class="bi bi-cart-dash"></i></a>
-                            
+                                <i class="bi bi-cart-dash"></i>
+                            </a>
+
                             |
                             <a class="text-center" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Movie.Id">
-                                <i class="bi bi-cart-plus"></i></a>
-                            
+                                <i class="bi bi-cart-plus"></i>
+                            </a>
+
                         </td>
                     </tr>
                 }
@@ -52,9 +54,10 @@
         </table>
         <div class="text-center">
             <div class="btn-group">
-                <a class="btn btn-outline-primary" asp-action="CompleteOrder">
-                    Complet order
-                </a>
+                @*<a class="btn btn-outline-primary" asp-action="CompleteOrder">
+                    Complete order
+                </a>*@
+                <div id="paypal-btn"></div>
                 <a class="btn btn-outline-success" asp-controller="Movies" asp-action="Index">
                     Add more items
                 </a>
@@ -62,3 +65,46 @@
         </div>
     </div>
 </div>
+
+@section Scripts{
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+    <script>
+        let _total = @Html.Raw(Model.ShoppingCartTotal)
+        paypal.Button.render({
+            //configure enviorment
+            env: 'sandbox',
+            client:{
+                sandbox: 'AVXeCiNZyFASfPM9wvFtxMM-4BoDhhZh26BnTJBIQ45HWyGE5kWl8c1wxnrddCz30c82JCgRc62IurH-'
+            },
+
+            //customize button
+            locale: 'en_US',
+            style:{
+                size: 'small',
+                color:'gold',
+                shape:'pill'
+            },
+            commit:true,
+
+            //setup payment
+            payment: function (data, actions) {
+                return actions.payment.create({
+                    transactions: [{
+                        amount:{
+                            total: _total,
+                            currency: 'USD'
+
+                        }
+                    }]
+                });
+            },
+            //execute payment
+            onAuthorize: function (data, actions) {
+                return actions.payment.execute().then(function (){
+                        var url = '@Url.Action("CompleteOrder","Orders", new {})';
+                    window.location.href = url;
+                });
+            }
+        }, '#paypal-btn');
+    </script>
+}
