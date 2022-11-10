@@ -24,11 +24,12 @@ namespace eTickets.Controllers
             return View(data);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString) {
             var allMovies = await _service.GetAllAsync(n => n.Cinema);
 
             if (!string.IsNullOrEmpty(searchString)) {
-                var filterResult = allMovies.Where(n => n.Name.Contains(searchString) || n.Description.Contains(searchString)).ToList();
+                var filterResult = allMovies.Where(n => string.Equals(n.Name, searchString, StringComparison.CurrentCultureIgnoreCase) || string.Equals(n.Description, searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
                 return View("Index", filterResult);
             }
 
